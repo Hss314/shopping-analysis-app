@@ -1,0 +1,1 @@
+# shopping-analysis-app
