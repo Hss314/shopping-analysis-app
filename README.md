@@ -3,6 +3,7 @@
 For the final report
 
 have 3 analyze :
+
 顧客購物模式分析   kmeans_analysis()
 
 促銷和折扣影響分析 discount_analysis()
