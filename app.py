@@ -161,15 +161,32 @@ def sales_trends_analysis():
     ax.set_ylabel("Product Category", fontsize=12)
     st.pyplot(fig)
 
-    # 可視化：產品類別在每月的銷售趨勢
-    df_top_categories = df_clean[df_clean["Product_Category"].isin(top_categories["Product_Category"])]
+    # 按產品類別分析銷售額
+    category_sales = df_clean.groupby("Product_Category")["Sales_Amount"].sum().reset_index()
+
+    # 只顯示銷售額前 10 的產品類別
+    top_categories = category_sales.sort_values("Sales_Amount", ascending=False).head(10)
+
     st.subheader("Monthly Sales Trend by Top Product Categories")
+    df_top_categories = df_clean[df_clean["Product_Category"].isin(top_categories["Product_Category"])]
+
+    # 確保 'Year_Month' 按日期順序排序
+    df_top_categories["Year_Month"] = pd.to_datetime(df_top_categories["Year_Month"], format='%Y-%m')
+    df_top_categories = df_top_categories.sort_values("Year_Month")
+
     fig, ax = plt.subplots(figsize=(14, 8))
     sns.lineplot(data=df_top_categories, x="Year_Month", y="Sales_Amount", hue="Product_Category", marker='o', palette="Set2", ax=ax)
+
+    # 設定標題與軸標籤
     ax.set_title("Monthly Sales Trend by Top Product Categories", fontsize=16)
     ax.set_xlabel("Month", fontsize=12)
     ax.set_ylabel("Total Sales Amount", fontsize=12)
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+
+    # 設定 x 軸的每月標籤
+    all_dates = pd.date_range(df_top_categories["Year_Month"].min(), df_top_categories["Year_Month"].max(), freq='MS')  # 每月起始
+    ax.set_xticks(all_dates)  # 設定所有月份為 x 軸刻度
+    ax.set_xticklabels([date.strftime('%Y-%m') for date in all_dates], rotation=45)  # 設定格式並旋轉
+
     ax.grid(True)
     ax.legend(title="Product Category", loc="upper left", bbox_to_anchor=(1, 1))
     st.pyplot(fig)
